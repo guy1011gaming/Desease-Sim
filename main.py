@@ -4,6 +4,11 @@ from scipy.stats import norm
 import random
 import time  
 
+## Creating dictionary of people
+
+peopleDictionary = []
+
+
 class Person():
     def __init__(self, startingImmunity):
         if random.randint(0,100)<startingImmunity:
@@ -17,8 +22,8 @@ class Person():
 
         self.friends = int((norm.rvs(size = 1, loc = 0.5, scale = 0.15)[0]*10).round(0)*10)
 
-        def wearMask():
-            self.contagiousness /= 2
+    def wearMask(self):
+        self.contagiousness /= 2
 
 ## Function to start the simulation...
 def initiateSim():
@@ -27,10 +32,9 @@ def initiateSim():
 
     numPeople = int(input("Population: "))
     startingImmunity = int(input("Starting-immunity-percentage: "))
-    startingInfecters = int(inpu("Amount of people who are infected initially: "))
+    startingInfecters = int(input("Amount of people who are infected initially: "))
 
-    ## Creating dictionary of people
-
+    
     for x in range(0, numPeople):
         peopleDictionary.append(Person(startingImmunity))
 
@@ -67,7 +71,7 @@ def runDay(daysContagious, lockdown):
             friendInQuestion = peopleDictionary[random.randint(0, len(peopleDictionary)-1)]
             if random.randint(0,100)<person.contagiousness and friendInQuestion.contagiousness == 0 and friendInQuestion.immunity == False:
                 friendInQuestion.contagiousness = int((norm.rvs(size=1, loc=0.5, scale=0.15)[0]*10).round(0)*10)
-                print(peopleDictionary.index(person) + " >>> " + peopleDictionary.index(friendInQuestion))
+                print(str(peopleDictionary.index(person)) + " >>> " + str(peopleDictionary.index(friendInQuestion)))
 
         for person in [person for person in peopleDictionary if person.contagiousness>0]:
             person.contagiousDays += 1 ## Adding a day of infection to person...
@@ -77,12 +81,14 @@ def runDay(daysContagious, lockdown):
             if person.contagiousDays > daysContagious:
                 person.immunity = True 
                 person.contagiousness = 0
-                print("Person " peopleDictionary.index(person) + " is now immune.")
+                print("Person " + str(peopleDictionary.index(person)) + " is now immune.")
 
 lockdown = False
 daysContagious, lockdownDay, maskDay = initiateSim()
+open('pandemicsave.txt', 'w').close()
 saveFile = open("pandemicsave.txt", "a")
-for x in range(0,100):
+
+for x in range(1,100):
     if x==lockdownDay:
         lockdown == True
 
@@ -92,8 +98,8 @@ for x in range(0,100):
     
     print("DAY", x)
     runDay(daysContagious, lockdown)
-    write = str(len(person for person in peopleDictionary if person.contagiousness>0)) + "\n"
+    write = str(len([person for person in peopleDictionary if person.contagiousness>0])) + "\n"
     saveFile.write(write)
-    print(len(person for person in peopleDictionary if person.contagiousness > 0) + " people infected on this day.")
+    print(str(len([person for person in peopleDictionary if person.contagiousness > 0])) + " people infected on this day.")
 
 saveFile.close()
