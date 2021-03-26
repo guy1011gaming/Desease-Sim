@@ -71,3 +71,29 @@ def runDay(daysContagious, lockdown):
 
         for person in [person for person in peopleDictionary if person.contagiousness>0]:
             person.contagiousDays += 1 ## Adding a day of infection to person...
+
+            ## Finding all the people, who have gone through a whole infection...
+
+            if person.contagiousDays > daysContagious:
+                person.immunity = True 
+                person.contagiousness = 0
+                print("Person " peopleDictionary.index(person) + " is now immune.")
+
+lockdown = False
+daysContagious, lockdownDay, maskDay = initiateSim()
+saveFile = open("pandemicsave.txt", "a")
+for x in range(0,100):
+    if x==lockdownDay:
+        lockdown == True
+
+    if x == maskDay:
+        for person in peopleDictionary:
+            person.wearMask()
+    
+    print("DAY", x)
+    runDay(daysContagious, lockdown)
+    write = str(len(person for person in peopleDictionary if person.contagiousness>0)) + "\n"
+    saveFile.write(write)
+    print(len(person for person in peopleDictionary if person.contagiousness > 0) + " people infected on this day.")
+
+saveFile.close()
