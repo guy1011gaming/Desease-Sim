@@ -13,14 +13,61 @@ class Person():
 
         self.contagiousness = 0 
         self.mask = False
-        self.schädlicheTage = 0
+        self.contagiousDays = 0
 
         self.friends = int((norm.rvs(size = 1, loc = 0.5, scale = 0.15)[0]*10).round(0)*10)
 
         def wearMask():
             self.contagiousness /= 2
 
+## Function to start the simulation...
+def initiateSim():
 
-def initiateSim:
+    ## User inputs basic parameters for the simulation
+
     numPeople = int(input("Population: "))
-      
+    startingImmunity = int(input("Starting-immunity-percentage: "))
+    startingInfecters = int(inpu("Amount of people who are infected initially: "))
+
+    ## Creating dictionary of people
+
+    for x in range(0, numPeople):
+        peopleDictionary.append(Person(startingImmunity))
+
+    ## Infecting random people from the dictionary with a random contagiousness 
+
+    for x in range(0, startingInfecters):
+        peopleDictionary[random.randint(0, len(peopleDictionary) - 1)].contagiousness = int((norm.rvs(size=1, loc=0.5, scale = 0.15)[0]*10).round(0)*10)
+    
+    ## Adding a few parameters, adjustable for the user...
+
+    daysContagious = int(input("For how many days shall a person stay contagiosness? "))
+    lockdownDay = int(input("Day for lockdown to be enforced: "))
+    maskDay = int(input("Day for masks to be used: "))
+    return daysContagious, lockdownDay, maskDay
+
+
+## Function for one day to be simulated
+
+def runDay(daysContagious, lockdown):
+
+    ## Going though every person in the dictionary
+
+    for person in [person for person in peopleDictionary if person.contagiousness>0 and person.friends>0]:
+        possibleContacts = int(person.friends/2)
+        if possibleContacts>0:
+            contactsToday = random.randint(0,possibleContacts)
+        else:
+            contactsToday = 0
+        
+        if lockdown == True:
+            contactsToday = 0
+
+        for i in range(0, contactsToday):
+            friendInQuestion = peopleDictionary[random.randint(0, len(peopleDictionary)-1)]
+            if random.randint(0,100)<person.contagiousness and friendInQuestion.contagiousness == 0 and friendInQuestion.immunity == False:
+                friendInQuestion.contagiousness = int((norm.rvs(size=1, loc=0.5, scale=0.15)[0]*10).round(0)*10)
+                print(peopleDictionary.index(person) + " >>> " + peopleDictionary.index(friendInQuestion))
+
+        for person in [person for person in peopleDictionary if person.contagiousness>0]:
+            person.contagiousDays += 1 ## Adding a day of infection to person...
